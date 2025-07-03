@@ -4,24 +4,29 @@
 #include <iostream>
 #include <stdint.h>
 
+#include "primatives.h"
+
 using namespace sycl;
 
 const size_t width = 1280, height = 720;
-
 
 void render(queue& q, std::vector<uint8_t>& pixels) {
     buffer<uint8_t, 1> buf(pixels.data(), range<1>(pixels.size()));
     q.submit([&](handler& h) {
         auto acc = buf.get_access<access::mode::write>(h);
         h.parallel_for(range<1>(width * height), [=](id<1> i) {
-            size_t index = i[0];
-            int x = index % width;
-            int y = index / width;
+            int index = i[0];
+
+            RandLCG rng(index);
+
+            float r = rng.next_float(0, 255);
+            float g = rng.next_float(0, 255);
+            float b = rng.next_float(0, 255);
 
             size_t base = index * 3;
-            acc[base + 0] = static_cast<uint8_t>((x) & 0xFF);       // R
-            acc[base + 1] = static_cast<uint8_t>((y) & 0xFF);       // G
-            acc[base + 2] = static_cast<uint8_t>((x * y) & 0xFF);   // B
+            acc[base + 0] = static_cast<uint8_t>(r * 255.0f);
+            acc[base + 1] = static_cast<uint8_t>(g * 255.0f);
+            acc[base + 2] = static_cast<uint8_t>(b * 255.0f);
         });
     }).wait();
 }
@@ -32,13 +37,11 @@ int main() {
         return -1;
     }
 
-    // Initialize SDL
     SDL_Init(SDL_INIT_VIDEO);
     SDL_Window* window = SDL_CreateWindow("SYCL Ray Tracer", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, 0);
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     SDL_Texture* texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB24, SDL_TEXTUREACCESS_STREAMING, width, height);
 
-    // Framebuffer
     std::vector<uint8_t> pixels(width * height * 3);
 
     queue q;
