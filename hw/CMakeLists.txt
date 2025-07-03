@@ -1,25 +1,42 @@
 cmake_minimum_required(VERSION 3.5)
 
-# Name of the project
-project(sysl_lab)
+project(ray_tracer LANGUAGES CXX)
 
-# Set the compiler
+# Set the compiler explicitly if not relying on environment
 set(CMAKE_CXX_COMPILER icpx)
 
-# Get all source files
+# Set C++ standard
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# Find all .cpp source files recursively in src/
 file(GLOB_RECURSE SOURCES "src/*.cpp")
 
-# Define target name
-set(TARGET_NAME ${CMAKE_PROJECT_NAME})
+# Create the executable
+add_executable(${PROJECT_NAME} ${SOURCES})
 
-# Set the executable
-add_executable(${TARGET_NAME} ${SOURCES})
+# Compile and link flags
+target_compile_options(${PROJECT_NAME} PRIVATE
+    -fsycl
+    -Wall
+    -pedantic
+    -Werror=return-type
+    -O3
+)
 
-# OS-specific options and libraries
-message(STATUS "Adding GCC style compiler flags")
-set(COMPILE_FLAGS "-fsycl -Wall -pedantic -Werror=return-type -O3")
-set(LINK_FLAGS "-fsycl")
+target_link_options(${PROJECT_NAME} PRIVATE
+    -fsycl
+)
 
-# Apply flags to the target
-set_target_properties(${TARGET_NAME} PROPERTIES COMPILE_FLAGS "${COMPILE_FLAGS}")
-set_target_properties(${TARGET_NAME} PROPERTIES LINK_FLAGS "${LINK_FLAGS}")
+# ------------------------
+# SDL2 (Optional for display)
+# ------------------------
+find_package(SDL2 REQUIRED)
+
+if(SDL2_FOUND)
+    message(STATUS "SDL2 found: ${SDL2_INCLUDE_DIRS}")
+    target_include_directories(${PROJECT_NAME} PRIVATE ${SDL2_INCLUDE_DIRS})
+    target_link_libraries(${PROJECT_NAME} PRIVATE ${SDL2_LIBRARIES})
+else()
+    message(FATAL_ERROR "SDL2 not found!")
+endif()
