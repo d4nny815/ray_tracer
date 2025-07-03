@@ -18,7 +18,7 @@ void test_kernel(queue& q) {
 }
 
 int main() {
-    constexpr size_t N = 10000;
+    // constexpr size_t N = 10000;
 
     queue q;
     try {

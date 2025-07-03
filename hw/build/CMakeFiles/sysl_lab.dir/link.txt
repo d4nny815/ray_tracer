@@ -1,1 +1,0 @@
-icpx -fsycl CMakeFiles/sysl_lab.dir/src/main.cpp.o -o sysl_lab
