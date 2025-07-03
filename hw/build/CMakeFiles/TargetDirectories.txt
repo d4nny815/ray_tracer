@@ -1,0 +1,3 @@
+/home/danny/projects/ray_tracer/hw/build/CMakeFiles/sysl_lab.dir
+/home/danny/projects/ray_tracer/hw/build/CMakeFiles/edit_cache.dir
+/home/danny/projects/ray_tracer/hw/build/CMakeFiles/rebuild_cache.dir

@@ -1,0 +1,7 @@
+{
+	"InstallScripts" : 
+	[
+		"/home/danny/projects/ray_tracer/hw/build/cmake_install.cmake"
+	],
+	"Parallel" : false
+}
